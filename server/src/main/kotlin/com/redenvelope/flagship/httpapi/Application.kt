@@ -1,18 +1,26 @@
 package com.redenvelope.flagship.httpapi
 
+import com.fasterxml.jackson.databind.SerializationFeature
 import io.ktor.application.*
 import io.ktor.features.*
-import io.ktor.serialization.*
+import io.ktor.jackson.*
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
 import routes.registerPaymentRoutes
 
+fun main() {
+    val port = 8080
+    val server = embeddedServer(Netty, port, module = Application::mainModule)
 
-fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
+    server.start()
+}
 
-fun Application.module() {
-//    allows server to examine Accept header to see if it can serve this specific type of content
+fun Application.mainModule() {
     install(ContentNegotiation) {
-//        json support is powered by kotlinx.serialization
-        json()
+        jackson {
+            enable(SerializationFeature.INDENT_OUTPUT)
+        }
     }
+
     registerPaymentRoutes()
 }
