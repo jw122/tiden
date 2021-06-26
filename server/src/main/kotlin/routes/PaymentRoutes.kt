@@ -15,6 +15,11 @@ fun Application.registerPaymentRoutes() {
 }
 
 fun Route.paymentRouting() {
+    route("/") {
+        get {
+            call.respondText("Hello, friend!")
+        }
+    }
     // Group everything that falls under the /payment endpoint
     route("/payment") {
         get {
