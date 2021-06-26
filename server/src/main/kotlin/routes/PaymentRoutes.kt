@@ -1,5 +1,6 @@
 package routes
 
+import circle.getStablecoins
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.request.*
@@ -54,6 +55,14 @@ fun Route.paymentRouting() {
             } else {
                 call.respondText("Not Found", status = HttpStatusCode.NotFound)
             }
+        }
+    }
+
+    route("/stablecoins") {
+        // calls the circle API for available stablecoins
+        get {
+            val response = circle.getStablecoins()
+            call.respondText(response)
         }
     }
 }
