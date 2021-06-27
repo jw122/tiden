@@ -16,3 +16,7 @@ data class Payment(
     val cvv: String,
     val sourceId: String,
     val sourceType: String)
+
+// TODO: all data access objects should have method to transform data from
+// result set to a POJO
+

@@ -20,40 +20,67 @@ in root directory `/red-envelopes` run
 source .env
 ```
 
+### initial setup for local postgres development env
+make sure to `source .env` first if you haven't
+
+```bash
+docker build . -t localdb -f store/devdb/Dockerfile --build-arg postgres_user=$POSTGRES_USER_DEV --build-arg postgres_password=$POSTGRES_PASSWORD_DEV --build-arg postgres_db=$POSTGRES_DB_DEV
+```
+
+```bash
+docker run -p 5432:5432 localdb
+```
+
+connect to the db with interactive shell
+```bash
+docker exec -it <name of container> psql -U $POSTGRES_USER_DEV $POSTGRES_DB_DEV
+```
+the password is in the `.env` file as `$POSTGRES_PASSWORD_DEV`
+
+TODO: set up RDS
+- add to .env production DB creds
+- modify existing code to write to DB vs store in in memory array
+- clean up readme. add sections. 
+
+
+
+
 ## docker build image
 build 
 ```bash
-docker build --no-cache -t demo .
+docker build --no-cache -t serverapp .
 ```
 run
 ```bash
-docker run -p 8080:8080 demo
+docker run -p 8080:8080 serverapp
 ```
 
 
-### aws ecr
+## Deploy to production
+#### build the image
+```bash
+docker build --no-cache -t serverapp .
+```
+
 #### push to aws ecr repo
+You only need to do this step once (to login)
 ```bash
 aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.us-east-2.amazonaws.com
 ```
+tag the image
 ```bash
-docker tag demo:latest $AWS_ACCOUNT_ID.dkr.ecr.us-east-2.amazonaws.com/red-envelope:latest
+docker tag serverapp:latest $AWS_ACCOUNT_ID.dkr.ecr.us-east-2.amazonaws.com/red-envelope:latest
 ```
+push the image up to ECR
 TODO this currently takes a pretty long time
 ```bash
 docker push 000710763965.dkr.ecr.us-east-2.amazonaws.com/red-envelope:latest
 ```
-#### deploy with aws app runner
-
+deploy the latest image in ECR to app runner
 ```bash
 aws apprunner start-deployment --service-arn $AWS_APPRUNNER_SERVICE_ARN
 ```
-then enter
-```json
-{
-  "ServiceArn": "$AWS_APPRUNNER_SERVICE_ARN"
-}
-```
+
 
 #### resources
 https://docs.aws.amazon.com/AmazonECR/latest/userguide/getting-started-cli.html
@@ -61,7 +88,7 @@ https://docs.aws.amazon.com/AmazonECR/latest/userguide/getting-started-cli.html
 ### troubleshoot
 - got 
 ```#8 0.313 Error: Could not find or load main class org.gradle.wrapper.GradleWrapperMain```
-  when trying to run `docker build --no-cache -t demo .` to fix, run `gradle wrapper` first.  
+  when trying to run `docker build --no-cache -t serverapp .` to fix, run `gradle wrapper` first.  
   
 #### docker troubleshoot
 to start a shell to try out commands 

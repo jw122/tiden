@@ -1,5 +1,6 @@
 package com.tiden.flagship.payment.routes
 
+import com.tiden.flagship.payment.PaymentService
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.request.*
@@ -23,8 +24,10 @@ fun Route.paymentRouting() {
     // Group everything that falls under the /payment endpoint
     route("/payment") {
         get {
-            if (paymentStorage.isNotEmpty()) {
-                call.respond(paymentStorage)
+
+            val payment = PaymentService.getAnyPayment()
+            if (payment != null) {
+                call.respond(payment)
             } else {
                 call.respondText("No payments found", status = HttpStatusCode.NotFound)
             }
@@ -35,7 +38,9 @@ fun Route.paymentRouting() {
                 status = HttpStatusCode.BadRequest
             )
 
-            val payment = paymentStorage.find { it.sourceId == id } ?: return@get call.respondText(
+            // TODO: remove this comment
+            // paymentStorage.find { it.sourceId == id }
+            val payment = PaymentService.getPaymentWithSourceId(id) ?: return@get call.respondText(
                 "No payment with this id: $id",
                 status = HttpStatusCode.NotFound
             )
@@ -66,6 +71,10 @@ fun Route.paymentRouting() {
 
             // TODO: update this to no longer use in-memory array for storage once we have DB
             paymentStorage.add(payment)
+
+            // inserting a payment to the database
+            PaymentService.addPayment(payment)
+
             call.respondText("Payment stored correctly: " + paymentResponse, status = HttpStatusCode.Created)
         }
     }
