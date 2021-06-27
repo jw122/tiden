@@ -7,4 +7,12 @@ val paymentStorage = mutableListOf<Payment>()
 
 // This annotation from kotlinx.serialization can work with Ktor to generate JSON representation for API responses automatically
 @Serializable
-data class Payment(val id: String, val amount: Int, val source: String, val type: String)
+data class Payment(
+    val amount: String,
+    val description: String,
+    val email: String,
+    val phoneNumber: String,
+    val verificationMethod: String,
+    val cvv: String,
+    val sourceId: String,
+    val sourceType: String)
