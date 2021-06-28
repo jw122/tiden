@@ -9,6 +9,7 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.serialization.Serializable
+import io.github.cdimascio.dotenv.dotenv
 
 @Serializable
 data class PaymentMetadata(val ipAddress: String, val email: String, val phoneNumber: String, val sessionId: String)
@@ -44,7 +45,8 @@ suspend fun makePayment(paymentRequest: PaymentRequest): String {
         }
     }
     val response: HttpResponse = client.post("https://api-sandbox.circle.com/v1/payments") {
-        val apiKey : String = System.getenv("CIRCLE_API_KEY") ?: ""
+        val dotenv = dotenv()
+        val apiKey : String = dotenv["CIRCLE_API_KEY"]
         headers {
             append(HttpHeaders.Accept, "application/json")
             append(HttpHeaders.Authorization, "Bearer " + apiKey)
