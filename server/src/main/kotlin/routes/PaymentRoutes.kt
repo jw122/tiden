@@ -1,6 +1,5 @@
 package routes
 
-import circle.getStablecoins
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.request.*
@@ -46,6 +45,8 @@ fun Route.paymentRouting() {
 
         post {
             val payment = call.receive<Payment>()
+            val ipAddress = call.request.local.remoteHost
+
             println("payment request body: " + payment)
             // Prepare a payment request
             // TODO: extract IP address from request, user session ID, encrypt the CVV
@@ -56,7 +57,7 @@ fun Route.paymentRouting() {
                 payment.amount,
                 payment.verificationMethod,
                 payment.cvv, // TODO: send encrypted
-                "key1",
+                "key1", // Unique identifier of the public key used in encryption
                 payment.description,
                 payment.email,
                 payment.phoneNumber,
