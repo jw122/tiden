@@ -5,7 +5,7 @@ plugins {
 }
 
 
-group 'com.redenvelope'
+group 'com.tiden'
 version '1.0.0-SNAPSHOT'
 
 repositories {
@@ -39,13 +39,13 @@ compileTestKotlin {
 }
 
 application {
-    mainClassName = 'com.redenvelope.flagship.httpapi.ApplicationKt'
+    mainClassName = 'com.tiden.flagship.httpapi.ApplicationKt'
 }
 
 // make a fat jar so all dependencies are included for the final executable
 jar {
     manifest {
-        attributes 'Main-Class': 'com.redenvelope.flagship.httpapi.ApplicationKt'
+        attributes 'Main-Class': 'com.tiden.flagship.httpapi.ApplicationKt'
     }
     duplicatesStrategy = 'warn'
     from {

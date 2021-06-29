@@ -1,12 +1,12 @@
-package routes
+package com.tiden.flagship.payment.routes
 
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
-import models.Payment
-import models.paymentStorage
+import com.tiden.flagship.payment.models.Payment
+import com.tiden.flagship.payment.models.paymentStorage
 
 fun Application.registerPaymentRoutes() {
     routing {
@@ -50,7 +50,7 @@ fun Route.paymentRouting() {
             println("payment request body: " + payment)
             // Prepare a payment request
             // TODO: extract IP address from request, user session ID, encrypt the CVV
-            val request = circle.buildPaymentRequest(
+            val request = com.tiden.flagship.circle.buildPaymentRequest(
                 payment.sourceId,
                 payment.sourceType,
                 "172.33.222.1",
@@ -62,7 +62,7 @@ fun Route.paymentRouting() {
                 payment.email,
                 payment.phoneNumber,
                 "xxx")
-            val paymentResponse = circle.makePayment(request)
+            val paymentResponse = com.tiden.flagship.circle.makePayment(request)
 
             // TODO: update this to no longer use in-memory array for storage once we have DB
             paymentStorage.add(payment)
@@ -71,9 +71,9 @@ fun Route.paymentRouting() {
     }
 
     route("/stablecoins") {
-        // calls the circle API for available stablecoins
+        // calls the com.tiden.flagship.circle API for available stablecoins
         get {
-            val response = circle.getStablecoins()
+            val response = com.tiden.flagship.circle.getStablecoins()
             call.respondText(response)
         }
     }
