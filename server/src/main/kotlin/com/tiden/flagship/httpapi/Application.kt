@@ -1,4 +1,4 @@
-package com.redenvelope.flagship.httpapi
+package com.tiden.flagship.httpapi
 
 import com.fasterxml.jackson.databind.SerializationFeature
 import io.ktor.application.*
@@ -6,7 +6,7 @@ import io.ktor.features.*
 import io.ktor.jackson.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-import routes.registerPaymentRoutes
+import com.tiden.flagship.payment.routes.registerPaymentRoutes
 
 fun main() {
     val port = 8080

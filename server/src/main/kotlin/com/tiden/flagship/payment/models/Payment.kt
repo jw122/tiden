@@ -1,4 +1,4 @@
-package models
+package com.tiden.flagship.payment.models
 
 import kotlinx.serialization.Serializable
 

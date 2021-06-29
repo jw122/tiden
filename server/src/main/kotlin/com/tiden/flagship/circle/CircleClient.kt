@@ -1,4 +1,4 @@
-package circle
+package com.tiden.flagship.circle
 
 import io.ktor.client.*
 import io.ktor.client.call.*
