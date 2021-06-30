@@ -8,8 +8,10 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import com.tiden.flagship.payment.models.Payment
 import com.tiden.flagship.payment.models.paymentStorage
+import io.ktor.features.*
 
 fun Application.registerPaymentRoutes() {
+    install(CallLogging)
     routing {
         paymentRouting()
     }
@@ -47,26 +49,62 @@ fun Route.paymentRouting() {
 
             call.respond(payment)
         }
-
         post {
             val payment = call.receive<Payment>()
-            val ipAddress = call.request.local.remoteHost
+            // Client makes a call to circle's /public endpoint to get a public key and encrypt card credentials (card num and CVV)
+            // The public key also comes with a keyId
+            // The encrypted CVV should be received here in the `encryptedData` field as a string
+            // TODO: client would pass in this keyId as a param after fetching public key. Once that's done, this code should extract from request params
+            val keyId = "key1"
+            // TODO: extract actual IP address
+            val ipAddress = "172.33.222.1"
+            // TODO: set up a sessionId (in client?)
+            val sessionId = "xxx"
 
-            println("payment request body: " + payment)
-            // Prepare a payment request
-            // TODO: extract IP address from request, user session ID, encrypt the CVV
+            call.application.environment.log.info("Preparing a payment request: " + payment)
+            val idempotencyKey = java.util.UUID.randomUUID().toString()
+
+            // Step 1: Create a card entity on Circle (or get existing one)
+            val cardRequest = com.tiden.flagship.circle.CreateCardRequest(
+                idempotencyKey,
+                keyId,
+                payment.expirationMonth,
+                payment.expirationYear,
+                payment.cvv,
+                mapOf(
+                    "line1" to payment.address,
+                    "city" to payment.city,
+                    "district" to payment.district,
+                    "postalCode" to payment.postalCode,
+                    "country" to payment.country,
+                    "name" to payment.name),
+                mapOf(
+                    "phoneNumber" to payment.phoneNumber,
+                    "email" to payment.email,
+                    "sessionId" to sessionId,
+                    "ipAddress" to ipAddress
+                )
+            )
+
+            println("card request: " + cardRequest)
+            val cardId = com.tiden.flagship.circle.createCard(cardRequest)
+            call.application.environment.log.info("Card successfully created: " + cardId)
+
+            // Step 2: Make the payment using sourceId given from card step
+            // The cardId will be passed into the payment request as sourceId
             val request = com.tiden.flagship.circle.buildPaymentRequest(
-                payment.sourceId,
+                idempotencyKey,
+                cardId,
                 payment.sourceType,
-                "172.33.222.1",
+                ipAddress,
                 payment.amount,
                 payment.verificationMethod,
-                payment.cvv, // TODO: send encrypted
-                "key1", // Unique identifier of the public key used in encryption
+                payment.cvv,
+                keyId,
                 payment.description,
                 payment.email,
                 payment.phoneNumber,
-                "xxx")
+                sessionId)
             val paymentResponse = com.tiden.flagship.circle.makePayment(request)
 
             // TODO: update this to no longer use in-memory array for storage once we have DB
