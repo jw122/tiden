@@ -107,10 +107,8 @@ fun Route.paymentRouting() {
                 sessionId)
             val paymentResponse = com.tiden.flagship.circle.makePayment(request)
 
-            // TODO: update this to no longer use in-memory array for storage once we have DB
-            paymentStorage.add(payment)
-
             // inserting a payment to the database
+            // T0DO: if circle responds in an error, still store the payment attempt
             PaymentService.addPayment(payment)
 
             call.respondText("Payment stored correctly: " + paymentResponse, status = HttpStatusCode.Created)

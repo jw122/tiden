@@ -27,6 +27,33 @@ data class PaymentRequest(val idempotencyKey: String, val keyId: String, val des
                           val source: Map<String, String>)
 
 @Serializable
+data class PaymentResponseData(
+    val id: String,
+    val type: String,
+    val merchantId: String,
+    val merchantWalletId: String,
+    val source: Map<String, String>,
+    val description: String,
+    val amount: Map<String, String>,
+    val status: String,
+    val verification: Map<String, String>? = null,
+    val cancel: Map<String, String>? = null,
+    val refunds: List<Map<String, String>>? = null,
+    val createDate: String,
+    val updateDate: String,
+    val metadata: Map<String, String>,
+    val errorCode: String? = null,
+    val riskEvaluation: Map<String, String>? = null,
+    val trackingRef: String? = null,
+    val fees: Map<String, String>? = null,
+)
+
+@Serializable
+data class PaymentResponse(
+    val data: PaymentResponseData
+)
+
+@Serializable
 data class CreateCardRequest(
     val idempotencyKey: String,
     val keyId: String,
@@ -74,7 +101,11 @@ fun createClient() : HttpClient{
 suspend fun createCard(createCardRequest: CreateCardRequest): String {
     val client = createClient()
     val response: HttpResponse = client.post("https://api-sandbox.circle.com/v1/cards") {
-        val dotenv = dotenv()
+        val dotenv = dotenv {
+            directory = "../"
+            ignoreIfMalformed = true
+            ignoreIfMissing = true
+        }
         val apiKey : String = dotenv["CIRCLE_API_KEY"]
         headers {
             append(HttpHeaders.Accept, "application/json")
@@ -101,7 +132,7 @@ suspend fun getStablecoins(): String {
     return response.readText()
 }
 
-suspend fun makePayment(paymentRequest: PaymentRequest): String {
+suspend fun makePayment(paymentRequest: PaymentRequest): PaymentResponse {
     val client = HttpClient(CIO) {
         install(JsonFeature) {
             serializer =  KotlinxSerializer()
@@ -123,9 +154,8 @@ suspend fun makePayment(paymentRequest: PaymentRequest): String {
         body = paymentRequest
         print("payment request to Circle: " + body + "\n")
     }
-    val responseBody: String = response.receive()
-    println("got response from payment: " + responseBody)
-    return responseBody
+
+    return response.receive()
 }
 
 fun buildPaymentRequest(idempotencyKey: String, sourceId: String, sourceType: String, ipAddress: String, amount: String, verificationMethod: String, encryptedData: String, pubKeyId: String, description: String, email: String, phoneNumber: String, userSessionId: String): PaymentRequest {
