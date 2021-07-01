@@ -86,7 +86,6 @@ fun Route.paymentRouting() {
                 )
             )
 
-            println("card request: " + cardRequest)
             val cardId = com.tiden.flagship.circle.createCard(cardRequest)
             call.application.environment.log.info("Card successfully created: " + cardId)
 
