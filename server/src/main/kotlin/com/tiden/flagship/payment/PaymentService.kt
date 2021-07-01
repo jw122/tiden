@@ -13,14 +13,14 @@ class PaymentService {
 
     companion object {
         fun addPayment(payment: Payment) {
-
+            // TODO: update this to include all fields in newly defined Payment object
             transaction {
                 addLogger(StdOutSqlLogger)
 
                 val sqlString = "INSERT INTO public.payment (amount, description, email, phone_number, verification_method, " +
                         "cvv, source_id, source_type)\n" +
                         "VALUES (${payment.amount}, '${payment.description}', '${payment.email}', '${payment.phoneNumber}', " +
-                        "'${payment.verificationMethod}', '${payment.cvv}', '${payment.sourceId}', '${payment.sourceType}');"
+                        "'${payment.verificationMethod}', '${payment.cvv}', '${payment.paymentId}', '${payment.sourceType}');"
                 exec(sqlString) {
                     while (it.next()) {
                         println("insert result $it.row")
@@ -76,6 +76,14 @@ class PaymentService {
                 rs.getString("cvv"),
                 rs.getString("source_id"),
                 rs.getString("source_type"),
+                rs.getInt("expirationMonth"),
+                rs.getInt("expirationYear"),
+                rs.getString("address"),
+                rs.getString("district"),
+                rs.getString("city"),
+                rs.getString("country"),
+                rs.getString("name"),
+                rs.getString("postalCode"),
             )
         }
     }

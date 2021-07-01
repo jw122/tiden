@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS public.payment
     "email"               varchar(255),
     "phone_number"        varchar(255),
     "verification_method" varchar(255),
-    "cvv"                 varchar(255),
+    "cvv"                 varchar(8000),
     "source_id"           varchar(255),
     "source_type"         varchar(255)
 );
