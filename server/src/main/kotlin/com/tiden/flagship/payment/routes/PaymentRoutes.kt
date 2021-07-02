@@ -23,6 +23,12 @@ fun Route.paymentRouting() {
             call.respondText("Hello, friend!")
         }
     }
+
+    route("/api/hello") {
+        get {
+            call.respond(mapOf("message" to "hello from Kotlin server"))
+        }
+    }
     // Group everything that falls under the /payment endpoint
     route("/payment") {
         get {

@@ -8,6 +8,7 @@ import io.ktor.jackson.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import com.tiden.flagship.payment.routes.registerPaymentRoutes
+import io.ktor.http.*
 import org.jetbrains.exposed.sql.Database
 
 fun main() {
@@ -24,6 +25,19 @@ fun Application.mainModule() {
         directory = "../"
         ignoreIfMalformed = true
         ignoreIfMissing = true
+    }
+
+    install(CORS) {
+        method(HttpMethod.Options)
+        method(HttpMethod.Get)
+        method(HttpMethod.Put)
+        method(HttpMethod.Post)
+        method(HttpMethod.Delete)
+        header(HttpHeaders.AccessControlAllowHeaders)
+        header(HttpHeaders.ContentType)
+        header(HttpHeaders.AccessControlAllowOrigin)
+        allowCredentials = true
+        anyHost()
     }
 
     val host : String = dotenv["POSTGRES_HOST_DEV"]

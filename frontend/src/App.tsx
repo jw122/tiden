@@ -1,79 +1,46 @@
-import React from "react";
+import React, { Component } from "react";
+
+import logo from "./logo.svg";
+
 import "./App.css";
-import { BrowserRouter as Router, Link, Route, Switch } from "react-router-dom";
+import { async } from "q";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <p>Welcome to Tiden</p>
-        <Router>
-          <div>
-            <nav>
-              <ul>
-                <li>
-                  <Link to="/">Home</Link>
-                </li>
-                <li>
-                  <Link to="/users">Users</Link>
-                </li>
-              </ul>
-            </nav>
-            <div>
-              <Calculator left={1} operator="+" right={2} />
-            </div>
-            {/* A <Switch> looks through its children <Route>s and
-            renders the first one that matches the current URL. */}
-            <Switch>
-              <Route path="/users">
-                <Users />
-              </Route>
-              <Route path="/">
-                <Home />
-              </Route>
-            </Switch>
-          </div>
-        </Router>
-      </header>
-    </div>
-  );
-}
+// TODO: move to env
+const SERVER_URL = "http://localhost:8080";
+class App extends Component {
+  state = {
+    message: "YOOO",
+  };
 
-function Home() {
-  return <h2>Home</h2>;
-}
+  componentDidMount() {
+    this.callApi()
+      .then((res) => this.setState({ message: res.message }))
+      .catch((err) => console.log(err));
+  }
 
-function Users() {
-  return <h2>Users</h2>;
-}
-
-const operations = {
-  "+": (left: number, right: number): number => left + right,
-  "-": (left: number, right: number): number => left - right,
-  "*": (left: number, right: number): number => left * right,
-  "/": (left: number, right: number): number => left / right,
-};
-type CalculatorProps = {
-  left: number;
-  operator: keyof typeof operations;
-  right: number;
-};
-function Calculator({ left, operator, right }: CalculatorProps) {
-  fetch("/stablecoins")
-    .then(function (response) {
-      console.log("received response! ", response);
-    })
-    .catch(function (error) {
-      console.log("Request failed", error);
+  callApi = async () => {
+    const response = await fetch(SERVER_URL + "/api/hello", {
+      method: "GET",
+      mode: "cors",
     });
-  const result = operations[operator](left, right);
-  return (
-    <div>
-      <code>
-        {left} {operator} {right} = <output>{result}</output>
-      </code>
-    </div>
-  );
+    console.log("response from server: ", response);
+    const body = await response.json();
+    console.log("got response from api: ", body);
+
+    return body;
+  };
+
+  render() {
+    return (
+      <div className="App">
+        <header className="App-header">
+          <img src={logo} className="App-logo" alt="logo" />
+          <h2>Welcome to Tiden</h2>
+          <p>{this.state.message}</p>
+        </header>
+      </div>
+    );
+  }
 }
 
 export default App;
