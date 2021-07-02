@@ -59,11 +59,13 @@ type CalculatorProps = {
   right: number;
 };
 function Calculator({ left, operator, right }: CalculatorProps) {
-  fetch("http://localhost:8080/stablecoins", {
-    mode: "no-cors",
-  }).then((response) => {
-    console.log("resopnse from api: ", response);
-  });
+  fetch("/stablecoins")
+    .then(function (response) {
+      console.log("received response! ", response);
+    })
+    .catch(function (error) {
+      console.log("Request failed", error);
+    });
   const result = operations[operator](left, right);
   return (
     <div>
