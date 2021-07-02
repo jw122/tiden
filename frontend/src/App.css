@@ -15,7 +15,6 @@
 
 .App-header {
   background-color: #282c34;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -26,6 +25,11 @@
 
 .App-link {
   color: #61dafb;
+}
+
+.payment-form {
+  width: 35%;
+  margin: auto;
 }
 
 @keyframes App-logo-spin {

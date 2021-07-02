@@ -23,6 +23,12 @@ fun Route.paymentRouting() {
             call.respondText("Hello, friend!")
         }
     }
+
+    route("/api/hello") {
+        get {
+            call.respond(mapOf("message" to "hello from Kotlin server"))
+        }
+    }
     // Group everything that falls under the /payment endpoint
     route("/payment") {
         get {
@@ -110,7 +116,7 @@ fun Route.paymentRouting() {
             // T0DO: if circle responds in an error, still store the payment attempt
             PaymentService.addPayment(payment)
 
-            call.respondText("Payment stored correctly: " + paymentResponse, status = HttpStatusCode.Created)
+            call.respondText("Payment stored correctly: " + paymentResponse.data.id, status = HttpStatusCode.Created)
         }
     }
 
