@@ -1,43 +1,41 @@
-import React from 'react';
-import './App.css';
-import {BrowserRouter as Router, Link, Route, Switch} from "react-router-dom";
+import React from "react";
+import "./App.css";
+import { BrowserRouter as Router, Link, Route, Switch } from "react-router-dom";
 
 function App() {
   return (
-      <div className="App">
-        <header className="App-header">
-          <p>
-            Welcome to Tiden
-          </p>
-          <Router>
+    <div className="App">
+      <header className="App-header">
+        <p>Welcome to Tiden</p>
+        <Router>
+          <div>
+            <nav>
+              <ul>
+                <li>
+                  <Link to="/">Home</Link>
+                </li>
+                <li>
+                  <Link to="/users">Users</Link>
+                </li>
+              </ul>
+            </nav>
             <div>
-              <nav>
-                <ul>
-                  <li>
-                    <Link to="/">Home</Link>
-                  </li>
-                  <li>
-                    <Link to="/users">Users</Link>
-                  </li>
-                </ul>
-              </nav>
-              <div>
-                <Calculator left={1} operator="+" right={2} />
-              </div>
-              {/* A <Switch> looks through its children <Route>s and
-            renders the first one that matches the current URL. */}
-              <Switch>
-                <Route path="/users">
-                  <Users/>
-                </Route>
-                <Route path="/">
-                  <Home/>
-                </Route>
-              </Switch>
+              <Calculator left={1} operator="+" right={2} />
             </div>
-          </Router>
-        </header>
-      </div>
+            {/* A <Switch> looks through its children <Route>s and
+            renders the first one that matches the current URL. */}
+            <Switch>
+              <Route path="/users">
+                <Users />
+              </Route>
+              <Route path="/">
+                <Home />
+              </Route>
+            </Switch>
+          </div>
+        </Router>
+      </header>
+    </div>
   );
 }
 
@@ -50,25 +48,30 @@ function Users() {
 }
 
 const operations = {
-  '+': (left: number, right: number): number => left + right,
-  '-': (left: number, right: number): number => left - right,
-  '*': (left: number, right: number): number => left * right,
-  '/': (left: number, right: number): number => left / right,
-}
+  "+": (left: number, right: number): number => left + right,
+  "-": (left: number, right: number): number => left - right,
+  "*": (left: number, right: number): number => left * right,
+  "/": (left: number, right: number): number => left / right,
+};
 type CalculatorProps = {
-  left: number
-  operator: keyof typeof operations
-  right: number
-}
-function Calculator({left, operator, right}: CalculatorProps) {
-  const result = operations[operator](left, right)
+  left: number;
+  operator: keyof typeof operations;
+  right: number;
+};
+function Calculator({ left, operator, right }: CalculatorProps) {
+  fetch("http://localhost:8080/stablecoins", {
+    mode: "no-cors",
+  }).then((response) => {
+    console.log("resopnse from api: ", response);
+  });
+  const result = operations[operator](left, right);
   return (
-      <div>
-        <code>
-          {left} {operator} {right} = <output>{result}</output>
-        </code>
-      </div>
-  )
+    <div>
+      <code>
+        {left} {operator} {right} = <output>{result}</output>
+      </code>
+    </div>
+  );
 }
 
 export default App;
