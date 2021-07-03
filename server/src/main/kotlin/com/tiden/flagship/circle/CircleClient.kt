@@ -12,19 +12,39 @@ import io.ktor.http.*
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class PaymentMetadata(val ipAddress: String, val email: String, val phoneNumber: String, val sessionId: String)
+data class PaymentMetadata(
+    val ipAddress: String?,
+    val email: String,
+    val phoneNumber: String?,
+    val sessionId: String?
+)
 
 @Serializable
 data class Source(val id: String, val type: String)
 
 @Serializable
-data class Amount(val amount: String, val currency: String)
+data class AmountCurrency(
+    val amount: String,
+    val currency: String,
+)
 
 @Serializable
-data class PaymentRequest(val idempotencyKey: String, val keyId: String, val description: String, val verification: String, val encryptedData: String,
-                          val metadata: Map<String, String>,
-                          val amount: Map<String, String>,
-                          val source: Map<String, String>)
+data class RiskEvaluation(
+    val decision: String,
+    val reason: String,
+)
+
+@Serializable
+data class CirclePaymentRequest(
+    val idempotencyKey: String,
+    val keyId: String,
+    val description: String,
+    val verification: String,
+    val encryptedData: String,
+    val metadata: PaymentMetadata,
+    val amount: AmountCurrency,
+    val source: Source
+)
 
 @Serializable
 data class PaymentResponseData(
@@ -32,9 +52,9 @@ data class PaymentResponseData(
     val type: String,
     val merchantId: String,
     val merchantWalletId: String,
-    val source: Map<String, String>,
+    val source: Source,
     val description: String,
-    val amount: Map<String, String>,
+    val amount: AmountCurrency,
     val status: String,
     val verification: Map<String, String>? = null,
     val cancel: Map<String, String>? = null,
@@ -43,25 +63,36 @@ data class PaymentResponseData(
     val updateDate: String,
     val metadata: Map<String, String>,
     val errorCode: String? = null,
-    val riskEvaluation: Map<String, String>? = null,
+    val riskEvaluation: RiskEvaluation? = null,
     val trackingRef: String? = null,
-    val fees: Map<String, String>? = null,
+    val fees: AmountCurrency? = null,
 )
 
 @Serializable
-data class PaymentResponse(
+data class CirclePaymentResponse(
     val data: PaymentResponseData
 )
 
 @Serializable
-data class CreateCardRequest(
+data class BillingDetails(
+    val name: String,
+    val city: String,
+    val country: String,
+    val line1: String,
+    val district: String,
+    val postalCode: String
+)
+
+@Serializable
+data class CircleCreateCardRequest(
     val idempotencyKey: String,
     val keyId: String,
     val expMonth: Int,
     val expYear: Int,
     val encryptedData: String,
-    val billingDetails: Map<String, String>,
-    val metadata: Map<String, String>)
+    val billingDetails: BillingDetails,
+    val metadata: PaymentMetadata
+)
 
 @Serializable
 data class CreateCardResponseData(
@@ -81,15 +112,16 @@ data class CreateCardResponseData(
     val metadata: Map<String, String>,
     val updateDate: String
 )
+
 @Serializable
-data class CreateCardResponse(
+data class CircleCreateCardResponse(
     val data: CreateCardResponseData,
 )
 
-fun createClient() : HttpClient{
+fun createClient(): HttpClient {
     return HttpClient(CIO) {
         install(JsonFeature) {
-            serializer =  KotlinxSerializer()
+            serializer = KotlinxSerializer()
         }
     }
 }
@@ -98,7 +130,7 @@ fun createClient() : HttpClient{
 // Encrypted card details (card number and CVV) come from the client
 // Some extra fields need to be included in the request to Circle's create card endpoint: billing details for your end user, a unique ID for the active session (sessionId) and the IP address of the end-user (ipAddress).
 // Finally, the Circle API will respond with a card containing id value (sourceId) that can be stored on our side to refer to this end-user's card in future payment requests (passed in as sourceId)
-suspend fun createCard(createCardRequest: CreateCardRequest): String {
+suspend fun createCard(circleCreateCardRequest: CircleCreateCardRequest): String {
     val client = createClient()
     val response: HttpResponse = client.post("https://api-sandbox.circle.com/v1/cards") {
         val dotenv = dotenv {
@@ -106,18 +138,18 @@ suspend fun createCard(createCardRequest: CreateCardRequest): String {
             ignoreIfMalformed = true
             ignoreIfMissing = true
         }
-        val apiKey : String = dotenv["CIRCLE_API_KEY"]
+        val apiKey: String = dotenv["CIRCLE_API_KEY"]
         headers {
             append(HttpHeaders.Accept, "application/json")
             append(HttpHeaders.Authorization, "Bearer " + apiKey)
         }
         contentType(ContentType.Application.Json)
-        body = createCardRequest
+        body = circleCreateCardRequest
         print("card creation request to Circle: " + body + "\n")
     }
-    val responseBody: CreateCardResponse = response.receive()
+    val responseBodyCircle: CircleCreateCardResponse = response.receive()
     // extract the card ID from the response + return it
-    return responseBody.data.id
+    return responseBodyCircle.data.id
 }
 
 suspend fun getStablecoins(): String {
@@ -132,10 +164,14 @@ suspend fun getStablecoins(): String {
     return response.readText()
 }
 
-suspend fun makePayment(paymentRequest: PaymentRequest): PaymentResponse {
+/**
+ * more details on the API here
+ * https://developers.circle.com/reference#payments-payments-get
+ */
+suspend fun makePayment(circlePaymentRequest: CirclePaymentRequest): CirclePaymentResponse? {
     val client = HttpClient(CIO) {
         install(JsonFeature) {
-            serializer =  KotlinxSerializer()
+            serializer = KotlinxSerializer()
         }
     }
     val response: HttpResponse = client.post("https://api-sandbox.circle.com/v1/payments") {
@@ -144,30 +180,48 @@ suspend fun makePayment(paymentRequest: PaymentRequest): PaymentResponse {
             ignoreIfMalformed = true
             ignoreIfMissing = true
         }
-        val apiKey : String = dotenv["CIRCLE_API_KEY"]
+        val apiKey: String = dotenv["CIRCLE_API_KEY"]
 
         headers {
             append(HttpHeaders.Accept, "application/json")
-            append(HttpHeaders.Authorization, "Bearer " + apiKey)
+            append(HttpHeaders.Authorization, "Bearer $apiKey")
         }
         contentType(ContentType.Application.Json)
-        body = paymentRequest
-        print("payment request to Circle: " + body + "\n")
+        body = circlePaymentRequest
+        print("payment request to Circle: $body\n")
+    }
+
+    if (response.status.value >= HttpStatusCode.BadRequest.value /*400*/) {
+        print("error with post request to circle payment with response content ${response.content}")
+        return null
     }
 
     return response.receive()
 }
 
-fun buildPaymentRequest(idempotencyKey: String, sourceId: String, sourceType: String, ipAddress: String, amount: String, verificationMethod: String, encryptedData: String, pubKeyId: String, description: String, email: String, phoneNumber: String, userSessionId: String): PaymentRequest {
-    println("building payment request for id " + idempotencyKey)
-    return PaymentRequest(
+fun buildPaymentRequest(
+    idempotencyKey: String,
+    sourceId: String,
+    sourceType: String,
+    ipAddress: String,
+    amount: String,
+    verificationMethod: String,
+    encryptedData: String,
+    pubKeyId: String,
+    description: String,
+    email: String,
+    phoneNumber: String,
+    userSessionId: String
+): CirclePaymentRequest {
+    println("building payment request for id $idempotencyKey")
+    return CirclePaymentRequest(
         idempotencyKey, // for ensuring exactly-once execution of mutating requests
         pubKeyId, // unique identifier of pub key used in encryption
         description,
         verificationMethod,
         encryptedData,
-        mapOf("ipAddress" to ipAddress, "email" to email, "phoneNumber" to phoneNumber, "sessionId" to userSessionId),
-        mapOf("amount" to amount, "currency" to "USD"),
-        mapOf("id" to sourceId, "type" to sourceType)
+        PaymentMetadata(ipAddress, email, phoneNumber, userSessionId),
+        AmountCurrency(amount, "USD"),
+        Source(sourceId, sourceType)
     )
 }
