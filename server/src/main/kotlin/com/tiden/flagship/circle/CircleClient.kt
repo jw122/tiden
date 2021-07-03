@@ -118,7 +118,18 @@ data class CircleCreateCardResponse(
     val data: CreateCardResponseData,
 )
 
-fun createClient(): HttpClient {
+@Serializable
+data class PublicKeyResponseData(
+    val keyId: String,
+    val publicKey: String
+)
+
+@Serializable
+data class PublicKeyResponse(
+    val data: PublicKeyResponseData
+)
+
+fun createClient() : HttpClient{
     return HttpClient(CIO) {
         install(JsonFeature) {
             serializer = KotlinxSerializer()
@@ -161,6 +172,25 @@ suspend fun getStablecoins(): String {
     }
     println("got response: " + response.readText());
     client.close()
+    return response.readText()
+}
+
+// queries the Circle /public endpoint to get PGP key for encrypting card credentials
+suspend fun getPublicKey(): String {
+    val client = createClient();
+    val dotenv = dotenv {
+        directory = "../"
+        ignoreIfMalformed = true
+        ignoreIfMissing = true
+    }
+    val apiKey: String = dotenv["CIRCLE_API_KEY"]
+    val response: HttpResponse = client.get("https://api-sandbox.circle.com/v1/encryption/public") {
+
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+            append(HttpHeaders.Authorization, "Bearer " + apiKey)
+        }
+    }
     return response.readText()
 }
 
