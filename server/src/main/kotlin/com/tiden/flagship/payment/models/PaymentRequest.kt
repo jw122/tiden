@@ -2,12 +2,9 @@ package com.tiden.flagship.payment.models
 
 import kotlinx.serialization.Serializable
 
-// In-memory storage for Payments (temporary). Will eventually be persisted in DB
-val paymentStorage = mutableListOf<Payment>()
-
 // This annotation from kotlinx.serialization can work with Ktor to generate JSON representation for API responses automatically
 @Serializable
-data class Payment(
+data class PaymentRequest(
     val paymentId: String? = null,
     val amount: String,
     val description: String,
