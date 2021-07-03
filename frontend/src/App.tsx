@@ -201,7 +201,7 @@ class App extends Component {
                 type="text"
                 className="form-control"
                 value={this.state.cardNumber}
-                onChange={(e) => this.setState({ cvv: e.target.value })}
+                onChange={(e) => this.setState({ cardNumber: e.target.value })}
               />
             </label>
           </div>
