@@ -1,0 +1,294 @@
+import React, { Component } from "react";
+import * as openpgp from "openpgp";
+
+import { Form, Row, Button, Col, Card } from "react-bootstrap";
+
+// TODO: move to env
+const SERVER_URL = "http://localhost:8080";
+
+// TODO: change to function() declaration
+class PaymentForm extends Component {
+  state = {
+    message: "",
+    name: "",
+    responseToPost: "",
+    // payment fields (TODO: move into its own group?)
+    amount: "10.50",
+    description: "gift money",
+    email: "hello@test.com",
+    phoneNumber: "+12025550180",
+    cardNumber: "5102420000000006",
+    cvv: "123",
+    expirationMonth: 1,
+    expirationYear: 2025,
+    cardholderName: "satoshi nakamoto",
+    address: "Test",
+    city: "Seattle",
+    district: "WA",
+    postalCode: "11111",
+    country: "US",
+  };
+
+  componentDidMount() {
+    this.callApi()
+      .then((res) => this.setState({ message: res.message }))
+      .catch((err) => console.log(err));
+  }
+
+  callApi = async () => {
+    const response = await fetch(SERVER_URL + "/api/hello");
+    console.log("response from server: ", response);
+    const body = await response.json();
+    console.log("got response from api: ", body);
+
+    return body;
+  };
+
+  // Gets public key and keyId from server
+  getPCIPublicKey = async () => {
+    const response = await fetch(SERVER_URL + "/encryption");
+
+    const responseBody = await response.json();
+
+    return {
+      keyId: responseBody.data.keyId,
+      publicKey: responseBody.data.publicKey,
+    };
+  };
+
+  // TODO: move all API calls to a Client module/component
+  encryptCredentials = async (cardCredentials: {
+    number: string;
+    cvv: string;
+  }) => {
+    const pciEncryptionKey = await this.getPCIPublicKey();
+
+    console.log("Obtained key. Now encrypting credentials");
+    const decodedPublicKey = atob(pciEncryptionKey.publicKey);
+    const publicKey = await openpgp.readKey({ armoredKey: decodedPublicKey });
+
+    return openpgp
+      .encrypt({
+        message: await openpgp.createMessage({
+          text: JSON.stringify(cardCredentials),
+        }),
+        encryptionKeys: publicKey,
+      })
+      .then((ciphertext) => {
+        return {
+          encryptedCredentials: btoa(ciphertext),
+          keyId: pciEncryptionKey.keyId,
+        };
+      });
+  };
+
+  handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    // Step 1: obtain the public key id and encrypt card credentials
+    var cardCredentials = {
+      number: this.state.cardNumber,
+      cvv: this.state.cvv,
+    };
+
+    var encryptedData = await this.encryptCredentials(cardCredentials);
+
+    // Step 2: Submit the payment
+    const response = await fetch(SERVER_URL + "/payment", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        amount: this.state.amount,
+        description: this.state.description,
+        email: this.state.email,
+        phoneNumber: this.state.phoneNumber,
+        verificationMethod: "cvv",
+        cvv: encryptedData.encryptedCredentials,
+        keyId: encryptedData.keyId,
+        sourceType: "card",
+        expirationMonth: this.state.expirationMonth,
+        expirationYear: this.state.expirationYear,
+        name: this.state.cardholderName,
+        address: this.state.address,
+        city: this.state.city,
+        district: this.state.district,
+        postalCode: this.state.postalCode,
+        country: this.state.country,
+        merchantId: "1",
+      }),
+    });
+
+    const responseBody = await response.text();
+    this.setState({ responseToPost: responseBody });
+  };
+
+  render() {
+    return (
+      <div>
+        <header className="App-header">
+          {/* <img src="" className="App-logo" alt="logo" /> */}
+
+          <Card className="Merchant-card">
+            <img
+              src="https://img.icons8.com/emoji/48/000000/person-detective.png"
+              className="Merchant-logo"
+              alt="logo"
+            />
+            <h2>Satoshi Nakamoto</h2>
+            <p>{this.state.message}</p>
+          </Card>
+        </header>
+
+        <p>{this.state.responseToPost}</p>
+
+        <Form className="payment-form" onSubmit={this.handleSubmit}>
+          <Form.Group className="m-3">
+            <Form.Label>Amount</Form.Label>
+            <Form.Control
+              value={this.state.amount}
+              onChange={(e) => this.setState({ amount: e.target.value })}
+            />
+          </Form.Group>
+
+          <Form.Group className="m-3">
+            <Form.Label>Description</Form.Label>
+            <Form.Control
+              value={this.state.description}
+              onChange={(e) => this.setState({ description: e.target.value })}
+            />
+          </Form.Group>
+
+          <Row className="m-3">
+            <Form.Group as={Col}>
+              <Form.Label>Email</Form.Label>
+              <Form.Control
+                type="email"
+                value={this.state.email}
+                onChange={(e) => this.setState({ email: e.target.value })}
+              />
+            </Form.Group>
+
+            <Form.Group as={Col}>
+              <Form.Label>Cardholder Name</Form.Label>
+              <Form.Control
+                type="text"
+                value={this.state.cardholderName}
+                onChange={(e) =>
+                  this.setState({ cardholderName: e.target.value })
+                }
+              />
+            </Form.Group>
+          </Row>
+
+          <Form.Group className="m-3">
+            <Form.Label>Phone Number</Form.Label>
+            <Form.Control
+              value={this.state.phoneNumber}
+              onChange={(e) => this.setState({ phoneNumber: e.target.value })}
+            />
+          </Form.Group>
+
+          <Row className="m-3">
+            <Form.Group as={Col}>
+              <Form.Label>Card Number</Form.Label>
+              <Form.Control
+                type="text"
+                value={this.state.cardNumber}
+                onChange={(e) => this.setState({ cardNumber: e.target.value })}
+              />
+            </Form.Group>
+
+            <Form.Group as={Col}>
+              <Form.Label>CVV</Form.Label>
+              <Form.Control
+                type="text"
+                value={this.state.cvv}
+                onChange={(e) => this.setState({ cvv: e.target.value })}
+              />
+            </Form.Group>
+          </Row>
+
+          <Row className="m-3">
+            <Form.Group as={Col}>
+              <Form.Label>Expiration Month</Form.Label>
+              <Form.Control
+                type="number"
+                value={this.state.expirationMonth}
+                onChange={(e) =>
+                  this.setState({ expirationMonth: e.target.value })
+                }
+              />
+            </Form.Group>
+
+            <Form.Group as={Col}>
+              <Form.Label>Expiration Year</Form.Label>
+              <Form.Control
+                type="number"
+                value={this.state.expirationYear}
+                onChange={(e) =>
+                  this.setState({ expirationYear: e.target.value })
+                }
+              />
+            </Form.Group>
+          </Row>
+
+          <Form.Group className="m-3">
+            <Form.Label>Address</Form.Label>
+            <Form.Control
+              value={this.state.address}
+              onChange={(e) => this.setState({ address: e.target.value })}
+            />
+          </Form.Group>
+
+          <Row className="m-3">
+            <Form.Group as={Col}>
+              <Form.Label>City</Form.Label>
+              <Form.Control
+                type="text"
+                value={this.state.city}
+                onChange={(e) => this.setState({ city: e.target.value })}
+              />
+            </Form.Group>
+
+            <Form.Group as={Col}>
+              <Form.Label>District</Form.Label>
+              <Form.Control
+                type="text"
+                value={this.state.district}
+                onChange={(e) => this.setState({ district: e.target.value })}
+              />
+            </Form.Group>
+          </Row>
+
+          <Row className="m-3">
+            <Form.Group as={Col} controlId="formGridEmail">
+              <Form.Label>Postal Code</Form.Label>
+              <Form.Control
+                type="text"
+                value={this.state.postalCode}
+                onChange={(e) => this.setState({ postalCode: e.target.value })}
+              />
+            </Form.Group>
+
+            <Form.Group as={Col} controlId="formGridPassword">
+              <Form.Label>Country</Form.Label>
+              <Form.Control
+                type="text"
+                value={this.state.country}
+                onChange={(e) => this.setState({ country: e.target.value })}
+              />
+            </Form.Group>
+          </Row>
+
+          <Button className="mb-3" variant="primary" type="submit">
+            Submit
+          </Button>
+        </Form>
+      </div>
+    );
+  }
+}
+
+export default PaymentForm;

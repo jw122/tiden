@@ -3,8 +3,28 @@
 }
 
 .App-logo {
-  height: 40vmin;
+  height: 20vmin;
   pointer-events: none;
+}
+
+.Merchant-card {
+  padding: 1em;
+  position: relative;
+  margin: 1rem 0 1rem 0;
+  background-color: #fff;
+  -webkit-transition: -webkit-box-shadow 0.25s;
+  transition: -webkit-box-shadow 0.25s;
+  transition: box-shadow 0.25s;
+  transition: box-shadow 0.25s, -webkit-box-shadow 0.25s;
+  border-radius: 5px;
+}
+
+.Merchant-logo {
+  /* height: 100px; */
+  /* width: 100px; */
+  height: 100px;
+  margin: auto;
+  margin-top: 10%;
 }
 
 @media (prefers-reduced-motion: no-preference) {
