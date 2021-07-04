@@ -2516,7 +2516,7 @@
   "resolved" "https://registry.npmjs.org/asap/-/asap-2.0.6.tgz"
   "version" "2.0.6"
 
-"asn1.js@^5.2.0":
+"asn1.js@^5.0.0", "asn1.js@^5.2.0":
   "integrity" "sha512-+I//4cYPccV8LdmBLiX8CYvf9Sp3vQsrqu2QNXRcrbiWvcx/UdlFiqUJJzxRQxgsZmvhXhn4cSKeSmoFjVdupA=="
   "resolved" "https://registry.npmjs.org/asn1.js/-/asn1.js-5.4.1.tgz"
   "version" "5.4.1"
@@ -7967,6 +7967,13 @@
   dependencies:
     "is-docker" "^2.0.0"
     "is-wsl" "^2.1.1"
+
+"openpgp@*":
+  "integrity" "sha512-5Yzd7hjoCtR0m27yrM6+Li1RcuUPIyVJXKMfR82HJotfst5NEEQHxCyUJvDWc8SqKS53zFyTl0SlPaZ08C2PxA=="
+  "resolved" "https://registry.npmjs.org/openpgp/-/openpgp-5.0.0-3.tgz"
+  "version" "5.0.0-3"
+  dependencies:
+    "asn1.js" "^5.0.0"
 
 "opn@^5.5.0":
   "integrity" "sha512-PqHpggC9bLV0VeWcdKhkpxY+3JTzetLSqTCWL/z/tFIbI6G8JCjondXklT1JinczLz2Xib62sSp0T/gKT4KksA=="
