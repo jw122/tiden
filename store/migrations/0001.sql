@@ -70,6 +70,7 @@ CREATE INDEX index_payment_status ON "public".payment
 GRANT ALL PRIVILEGES ON TABLE public.payment TO flagship;
 
 -- merchant_balance table
+-- TODO: add currency type to merchant balance. a merchant can possibly hold diff crypto / fiat in one account
 DROP TABLE IF EXISTS public.merchant_balance;
 CREATE TABLE public.merchant_balance
 (

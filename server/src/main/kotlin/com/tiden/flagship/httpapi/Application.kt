@@ -1,6 +1,7 @@
 package com.tiden.flagship.httpapi
 
 import com.fasterxml.jackson.databind.SerializationFeature
+import com.tiden.flagship.merchant.registerMerchantRoutes
 import io.github.cdimascio.dotenv.dotenv
 import io.ktor.application.*
 import io.ktor.features.*
@@ -57,6 +58,7 @@ fun Application.mainModule() {
     }
 
     registerPaymentRoutes()
+    registerMerchantRoutes()
 
 
 }
