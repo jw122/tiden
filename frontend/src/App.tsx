@@ -1,4 +1,6 @@
 import "bootstrap/dist/css/bootstrap.min.css";
+import * as openpgp from "openpgp";
+
 import React, { Component } from "react";
 
 import logo from "./logo.svg";
@@ -18,7 +20,8 @@ class App extends Component {
     description: "gift money",
     email: "hello@test.com",
     phoneNumber: "+12025550180",
-    cvv: "LS0tLS1CRUdJTiBQR1AgTUVTU0FHRS0tLS0tDQpWZXJzaW9uOiBPcGVuUEdQLmpzIHY0LjEwLjQNCkNvbW1lbnQ6IGh0dHBzOi8vb3BlbnBncGpzLm9yZw0KDQp3Y0JNQTBYV1NGbEZScFZoQVFnQXF6N01LMmJiZnpWODBkeHZEeE11WnFIcU9peFVSY2ZHS2lOM0FrVjINCkl1N1lRMXRsVlVvSzArUVBCVFFxQ0JCdmNFV0RYYktjZmpqbmluMEJkVWR1NVNqdkJKRytmcmJMb3VXZQ0KUk5TWUdoczA5cGRwUjdnc2hYNjhqaEpnRWdVZzF4ZUt3V0FReFJwZE5OTzhxY3pUQnRhVkdBQ1Y3UW00DQpTSEtvQTJrWklmK2dtQy95K3VMSUswdVZDRUs0TkNlck9LRUc1MlJEUlI1MXU0K0xnUHNpZVN5bkoxSFINCklYMktJbWpTZWZsZHNvUHp2TW5KUFY3U2tjRzVHa3I2cWE4TnpsM1dTY2srdS9MZmdRQVRYOFdRM1FzOA0KWDRod0t2U293TnkxaEdEWnEvY0g3RVhSMlpuQnM4ZDdlM25oWGgxMHhXT3pvNEpIQko3Z2JrQk9CTU9aDQpqTkpoQVpXWU9ZNjlBT2EwVHhYZ3NqYUhxcGlud3BtQnJOMlorRExpeWt1U1UyYTNQVm93clV6aXJTOFINCm9qYndnd1d4Szg1TzZ1Y0Y2Tlo5WFdQWXBNUVFEY3dnVkliQ3Q1L3YvTk5BTzhnZXhheWlVS2FBS28wUw0KbHdyQitoSWYwdDNyNkE9PQ0KPVpMZjQNCi0tLS0tRU5EIFBHUCBNRVNTQUdFLS0tLS0NCg==",
+    cardNumber: "5102420000000006",
+    cvv: "123",
     expirationMonth: 1,
     expirationYear: 2025,
     cardholderName: "satoshi nakamoto",
@@ -44,9 +47,57 @@ class App extends Component {
     return body;
   };
 
+  // Gets public key and keyId from server
+  getPCIPublicKey = async () => {
+    const response = await fetch(SERVER_URL + "/encryption");
+
+    const responseBody = await response.json();
+
+    return {
+      keyId: responseBody.data.keyId,
+      publicKey: responseBody.data.publicKey,
+    };
+  };
+
+  // TODO: move all API calls to a Client module/component
+  encryptCredentials = async (cardCredentials: {
+    number: string;
+    cvv: string;
+  }) => {
+    const pciEncryptionKey = await this.getPCIPublicKey();
+
+    console.log("Obtained key. Now encrypting credentials");
+    const decodedPublicKey = atob(pciEncryptionKey.publicKey);
+    const publicKey = await openpgp.readKey({ armoredKey: decodedPublicKey });
+
+    return openpgp
+      .encrypt({
+        message: await openpgp.createMessage({
+          text: JSON.stringify(cardCredentials),
+        }),
+        encryptionKeys: publicKey,
+      })
+      .then((ciphertext) => {
+        return {
+          encryptedCredentials: btoa(ciphertext),
+          keyId: pciEncryptionKey.keyId,
+        };
+      });
+  };
+
   handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    console.log("submitting form!");
     event.preventDefault();
+
+    // Step 1: obtain the public key id and encrypt card credentials
+
+    var cardCredentials = {
+      number: this.state.cardNumber,
+      cvv: this.state.cvv,
+    };
+
+    var encryptedData = await this.encryptCredentials(cardCredentials);
+
+    // Step 2: Submit the payment
     const response = await fetch(SERVER_URL + "/payment", {
       method: "POST",
       headers: {
@@ -58,7 +109,8 @@ class App extends Component {
         email: this.state.email,
         phoneNumber: this.state.phoneNumber,
         verificationMethod: "cvv",
-        cvv: this.state.cvv,
+        cvv: encryptedData.encryptedCredentials,
+        keyId: encryptedData.keyId,
         sourceType: "card",
         expirationMonth: this.state.expirationMonth,
         expirationYear: this.state.expirationYear,
@@ -139,6 +191,17 @@ class App extends Component {
                 className="form-control"
                 value={this.state.phoneNumber}
                 onChange={(e) => this.setState({ phoneNumber: e.target.value })}
+              />
+            </label>
+          </div>
+          <div className="form-group">
+            <label>
+              Card Number
+              <input
+                type="text"
+                className="form-control"
+                value={this.state.cardNumber}
+                onChange={(e) => this.setState({ cardNumber: e.target.value })}
               />
             </label>
           </div>

@@ -55,11 +55,8 @@ fun Route.paymentRouting() {
         }
         post {
             val paymentRequest = call.receive<PaymentRequest>()
-            // Client makes a call to circle's /public endpoint to get a public key and encrypt card credentials (card num and CVV)
-            // The public key also comes with a keyId
-            // The encrypted CVV should be received here in the `encryptedData` field as a string
-            // TODO: client would pass in this keyId as a param after fetching public key. Once that's done, this code should extract from request params
-            val keyId = "key1"
+            // Unique identifier of pub key used in encryption. Not currently persisted
+            val keyId = paymentRequest.keyId.toString();
             // TODO: extract actual IP address
             val ipAddress = "172.33.222.1"
             // TODO: set up a sessionId (in client?)
@@ -130,6 +127,13 @@ fun Route.paymentRouting() {
         // calls the com.tiden.flagship.circle API for available stablecoins
         get {
             val response = com.tiden.flagship.circle.getStablecoins()
+            call.respondText(response)
+        }
+    }
+
+    route("/encryption") {
+        get {
+            val response = com.tiden.flagship.circle.getPublicKey();
             call.respondText(response)
         }
     }
