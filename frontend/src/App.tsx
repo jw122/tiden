@@ -131,7 +131,7 @@ class App extends Component {
     return (
       <div className="App">
         <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
+          <embed src={logo} className="App-logo" />
           <h2>Welcome to Tiden</h2>
           <p>{this.state.message}</p>
         </header>
