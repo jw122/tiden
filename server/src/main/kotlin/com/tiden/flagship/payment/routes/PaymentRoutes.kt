@@ -2,13 +2,13 @@ package com.tiden.flagship.payment.routes
 
 import com.tiden.flagship.circle.*
 import com.tiden.flagship.payment.PaymentService
+import com.tiden.flagship.payment.models.PaymentRequest
 import io.ktor.application.*
+import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
-import com.tiden.flagship.payment.models.PaymentRequest
-import io.ktor.features.*
 
 fun Application.registerPaymentRoutes() {
     install(CallLogging)
