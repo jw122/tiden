@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import * as openpgp from "openpgp";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCoffee, faCreditCard } from "@fortawesome/free-solid-svg-icons";
 
 import { Form, Row, Button, Col, Card, Alert } from "react-bootstrap";
 import classes from "./PaymentForm.module.css";
@@ -150,14 +152,16 @@ class PaymentForm extends Component {
           </Card>
         </header>
         <Alert className={classes.tip} variant="warning">
-          Send this creator or merchant some love, using your credit card of
-          choice in <b>any curency</b>.
+          <FontAwesomeIcon icon={faCoffee} /> Send this creator or merchant some
+          love, using your credit card of choice in <b>any currency</b>.
           <p>They will instantly receive your payment in USDC.</p>
         </Alert>
 
         {/* Supported cards */}
         <div className={classes.supportedCards}>
-          <h5>Supported Cards</h5>
+          <h5>
+            <FontAwesomeIcon icon={faCreditCard} /> Supported Cards
+          </h5>
           <img src="https://img.icons8.com/color/32/000000/visa.png" />
           <img src="https://img.icons8.com/color/32/000000/mastercard.png" />
         </div>
