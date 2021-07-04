@@ -1,0 +1,44 @@
+.header {
+  margin-top: 1em;
+  color: rgb(180, 146, 33);
+}
+
+.paymentForm {
+  width: 40%;
+  margin: auto;
+  padding: 0px;
+}
+
+.col {
+  padding: 10px;
+  /* margin: 0px; */
+}
+
+.merchantCard {
+  padding: 1em;
+  position: relative;
+  margin: 2rem 0 1rem 0;
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: "8px 7px 8px -1px #ADADAD";
+  width: 30%;
+}
+
+.merchantLogo {
+  height: 100px;
+  margin: auto;
+  margin-top: 10%;
+}
+
+.tip {
+  width: 60%;
+  margin: auto;
+  margin-top: 2em;
+}
+
+.supportedCards {
+  margin-left: 20%;
+  margin-top: 2%;
+  align-content: center;
+  /* text-align: center; */
+}

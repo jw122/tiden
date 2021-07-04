@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import * as openpgp from "openpgp";
 
-import { Form, Row, Button, Col, Card } from "react-bootstrap";
+import { Form, Row, Button, Col, Card, Alert } from "react-bootstrap";
+import classes from "./PaymentForm.module.css";
 
 // TODO: move to env
 const SERVER_URL = "http://localhost:8080";
@@ -128,23 +129,44 @@ class PaymentForm extends Component {
     return (
       <div>
         <header className="App-header">
-          {/* <img src="" className="App-logo" alt="logo" /> */}
-
-          <Card className="Merchant-card">
+          <div className="shadow-box-example z-depth-5"></div>
+          <Card
+            className={classes.merchantCard}
+            style={{
+              boxShadow: "1px 2px 7px 7px #D8D8D8",
+              borderRadius: "10px",
+              borderWidth: "0px",
+            }}
+          >
             <img
-              src="https://img.icons8.com/emoji/48/000000/person-detective.png"
-              className="Merchant-logo"
+              src="https://res.cloudinary.com/sagacity/image/upload/c_crop,h_800,w_616,x_0,y_0/c_scale,w_640/v1419879339/iVegJ35_xfjlfu.gif"
+              className={classes.merchantLogo}
               alt="logo"
             />
-            <h2>Satoshi Nakamoto</h2>
-            <p>{this.state.message}</p>
+            <Card.Title className={classes.header}>Shiba Inu</Card.Title>
+            <Card.Subtitle className="mb-2 text-muted">
+              Minter of coins and memes. Thank you for worshipping me!
+            </Card.Subtitle>
           </Card>
         </header>
+        <Alert className={classes.tip} variant="warning">
+          Send this creator or merchant some love, using your credit card of
+          choice in <b>any curency</b>.
+          <p>They will instantly receive your payment in USDC.</p>
+        </Alert>
 
-        <p>{this.state.responseToPost}</p>
+        {/* Supported cards */}
+        <div className={classes.supportedCards}>
+          <h5>Supported Cards</h5>
+          <img src="https://img.icons8.com/color/32/000000/visa.png" />
+          <img src="https://img.icons8.com/color/32/000000/mastercard.png" />
+        </div>
 
-        <Form className="payment-form" onSubmit={this.handleSubmit}>
-          <Form.Group className="m-3">
+        <div>
+          <p>{this.state.responseToPost}</p>
+        </div>
+        <Form className={classes.paymentForm} onSubmit={this.handleSubmit}>
+          <Form.Group className="m-4">
             <Form.Label>Amount</Form.Label>
             <Form.Control
               value={this.state.amount}
@@ -152,7 +174,7 @@ class PaymentForm extends Component {
             />
           </Form.Group>
 
-          <Form.Group className="m-3">
+          <Form.Group className="m-4">
             <Form.Label>Description</Form.Label>
             <Form.Control
               value={this.state.description}
@@ -160,7 +182,7 @@ class PaymentForm extends Component {
             />
           </Form.Group>
 
-          <Row className="m-3">
+          <Row className="m-2">
             <Form.Group as={Col}>
               <Form.Label>Email</Form.Label>
               <Form.Control
@@ -182,7 +204,7 @@ class PaymentForm extends Component {
             </Form.Group>
           </Row>
 
-          <Form.Group className="m-3">
+          <Form.Group className="m-4">
             <Form.Label>Phone Number</Form.Label>
             <Form.Control
               value={this.state.phoneNumber}
@@ -190,7 +212,7 @@ class PaymentForm extends Component {
             />
           </Form.Group>
 
-          <Row className="m-3">
+          <Row className="m-2">
             <Form.Group as={Col}>
               <Form.Label>Card Number</Form.Label>
               <Form.Control
@@ -210,7 +232,7 @@ class PaymentForm extends Component {
             </Form.Group>
           </Row>
 
-          <Row className="m-3">
+          <Row className="m-2">
             <Form.Group as={Col}>
               <Form.Label>Expiration Month</Form.Label>
               <Form.Control
@@ -234,7 +256,7 @@ class PaymentForm extends Component {
             </Form.Group>
           </Row>
 
-          <Form.Group className="m-3">
+          <Form.Group className="m-4">
             <Form.Label>Address</Form.Label>
             <Form.Control
               value={this.state.address}
@@ -242,7 +264,7 @@ class PaymentForm extends Component {
             />
           </Form.Group>
 
-          <Row className="m-3">
+          <Row className="m-2">
             <Form.Group as={Col}>
               <Form.Label>City</Form.Label>
               <Form.Control
@@ -262,7 +284,7 @@ class PaymentForm extends Component {
             </Form.Group>
           </Row>
 
-          <Row className="m-3">
+          <Row className="m-2">
             <Form.Group as={Col} controlId="formGridEmail">
               <Form.Label>Postal Code</Form.Label>
               <Form.Control
@@ -282,7 +304,7 @@ class PaymentForm extends Component {
             </Form.Group>
           </Row>
 
-          <Button className="mb-3" variant="primary" type="submit">
+          <Button className="m-4" variant="warning" type="submit">
             Submit
           </Button>
         </Form>
