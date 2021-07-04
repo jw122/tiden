@@ -15,10 +15,8 @@ import java.sql.ResultSet
 class PaymentService {
 
     companion object {
-        fun storeSuccessfulPayment(cardRequest: CircleCreateCardRequest, paymentRequest: PaymentRequest, paymentResponse: PaymentResponseData) {
+        fun storeSuccessfulPayment(cardRequest: CircleCreateCardRequest, paymentRequest: CirclePaymentRequest, paymentResponse: PaymentResponseData) {
             // TODO: look into JOOQ codegen + DSL
-
-            // update payment table
             transaction {
                 addLogger(StdOutSqlLogger)
 
@@ -31,14 +29,14 @@ class PaymentService {
                         "create_date, update_date, currency, " +
                         "merchant_id," +
                         "status) " +
-                        "VALUES (${paymentRequest.amount}, '${paymentResponse.id}', '${paymentRequest.description}', '${paymentRequest.email}', '${paymentRequest.phoneNumber}', " +
-                        "'${paymentRequest.verificationMethod}', '${paymentResponse.source.id}', '${paymentResponse.source.type}', '${cardRequest.encryptedData}', '${cardRequest.expMonth}', '${cardRequest.expYear}', " +
+                        "VALUES (${paymentRequest.amount.amount}, '${paymentResponse.id}', '${paymentRequest.description}', '${paymentRequest.metadata.email}', '${paymentRequest.metadata.phoneNumber}', " +
+                        "'${paymentRequest.verification}', '${paymentResponse.source.id}', '${paymentResponse.source.type}', '${cardRequest.encryptedData}', '${cardRequest.expMonth}', '${cardRequest.expYear}', " +
                         "'${cardRequest.billingDetails.name}', '${cardRequest.billingDetails.line1}', '${cardRequest.billingDetails.city}', '${cardRequest.billingDetails.district}', '${cardRequest.billingDetails.postalCode}', '${cardRequest.billingDetails.country}', " +
                         "'${paymentResponse.merchantId}', '${paymentResponse.merchantWalletId}', " +
                         "'${paymentResponse.fees?.amount}', '${paymentResponse.fees?.currency}', '${paymentResponse.trackingRef}', " +
                         "'${paymentResponse.riskEvaluation?.reason}', '${paymentResponse.riskEvaluation?.decision}', " +
                         "'${paymentResponse.createDate}', '${paymentResponse.updateDate}', '${paymentResponse.amount.currency}', " +
-                        "${paymentRequest.merchantId}, " +
+                        "1, " + // hardcoding merchant id as 1
                         "'CREATED'" + // TODO: if we're reusing this to insert at other parts of the request make this a parameter
                         ");"
                 exec(sqlString) {
@@ -47,20 +45,9 @@ class PaymentService {
                     }
                 }
             }
-
-            // update merchant_balance table
-            transaction {
-                val sqlString = "UPDATE public.merchant_balance SET amount = amount + ${ paymentRequest.amount} WHERE merchant_id = ${paymentRequest.merchantId};"
-
-                exec(sqlString) {
-                    while (it.next()) {
-                        println("insert result $it.row")
-                    }
-                }
-            }
         }
 
-        fun storeFailedPayment(cardRequest: CircleCreateCardRequest, paymentRequest: PaymentRequest) {
+        fun storeFailedPayment(cardRequest: CircleCreateCardRequest, paymentRequest: CirclePaymentRequest) {
             transaction {
                 addLogger(StdOutSqlLogger)
 
@@ -73,14 +60,14 @@ class PaymentService {
                         "create_date, update_date, currency, " +
                         "merchant_id," +
                         "status) " +
-                        "VALUES (${paymentRequest.amount}, NULL, '${paymentRequest.description}', '${paymentRequest.email}', '${paymentRequest.phoneNumber}', " +
-                        "'${paymentRequest.cvv}', NULL, NULL, '${cardRequest.encryptedData}', '${cardRequest.expMonth}', '${cardRequest.expYear}', " +
+                        "VALUES (${paymentRequest.amount.amount}, NULL, '${paymentRequest.description}', '${paymentRequest.metadata.email}', '${paymentRequest.metadata.phoneNumber}', " +
+                        "'${paymentRequest.verification}', NULL, NULL, '${cardRequest.encryptedData}', '${cardRequest.expMonth}', '${cardRequest.expYear}', " +
                         "'${cardRequest.billingDetails.name}', '${cardRequest.billingDetails.line1}', '${cardRequest.billingDetails.city}', '${cardRequest.billingDetails.district}', '${cardRequest.billingDetails.postalCode}', '${cardRequest.billingDetails.country}', " +
                         "NULL, NULL, " +
                         "NULL, NULL, NULL, " +
                         "NULL, NULL, " +
                         "NULL, NULL, NULL, " +
-                        "${paymentRequest.merchantId}, " +
+                        "1, " + // hardcoding merchant id as 1
                         "'FAILED'" + // TODO: if we're reusing this to insert at other parts of the request make this a parameter
                         ");"
                 exec(sqlString) {
@@ -146,8 +133,6 @@ class PaymentService {
                 rs.getString("district"),
                 rs.getString("postalCode"),
                 rs.getString("country"),
-                rs.getString("key_id"),
-                rs.getString("merchant_id")
             )
         }
     }

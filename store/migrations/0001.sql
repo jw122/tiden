@@ -80,8 +80,6 @@ CREATE TABLE public.merchant_balance
     CONSTRAINT FK_merhant_balance_merchant FOREIGN KEY (merchant_id) REFERENCES merchant ("id")
 );
 
-INSERT INTO public.merchant_balance(id, amount, merchant_id) VALUES (1, 0, 1);
-
 CREATE INDEX index_fk_merchant_balance_merchant_id ON public.merchant_balance
     (
      merchant_id

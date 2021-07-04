@@ -26,8 +26,7 @@ data class PaymentRequest(
     // must be valid ISO 31660-2 country code
     val country: String,
     // id of the pub key used for encrypting card credentials
-    val keyId: String? = null,
-    val merchantId: String
+    val keyId: String? = null
     )
 
 // TODO: all data access objects should have method to transform data from

@@ -107,13 +107,13 @@ fun Route.paymentRouting() {
             val circlePaymentResponse: CirclePaymentResponse? = makePayment(circlePaymentRequest)
 
             if (circlePaymentResponse != null) {
-                PaymentService.storeSuccessfulPayment(cardRequest, paymentRequest, circlePaymentResponse.data)
+                PaymentService.storeSuccessfulPayment(cardRequest, circlePaymentRequest, circlePaymentResponse.data)
                 call.respondText(
                     "Payment stored correctly: " + circlePaymentResponse.data.id,
                     status = HttpStatusCode.Created
                 )
             } else {
-                PaymentService.storeFailedPayment(cardRequest, paymentRequest)
+                PaymentService.storeFailedPayment(cardRequest, circlePaymentRequest)
                 call.respondText(
                     "unable to process payment: " + circlePaymentRequest.metadata,
                     status = HttpStatusCode.InternalServerError
