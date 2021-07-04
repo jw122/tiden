@@ -11,32 +11,19 @@ import {
 import React, { Component } from "react";
 import { Route, Switch } from "react-router-dom";
 
-import logo from "./logo.svg";
 import "./App.css";
 
 import Landing from "./pages/Landing";
 import MerchantProfile from "./pages/MerchantProfile";
 import Dashboard from "./pages/Dashboard";
+import MainNavigation from "./components/layout/MainNavigation";
 
 // TODO: change to function() declaration
 class App extends Component {
   render() {
     return (
       <div className="App">
-        <Navbar bg="dark" variant="dark">
-          <Container>
-            <Navbar.Brand href="#home">
-              <img
-                alt=""
-                src={logo}
-                width="30"
-                height="30"
-                className="d-inline-block align-top"
-              />{" "}
-              Tiden
-            </Navbar.Brand>
-          </Container>
-        </Navbar>
+        <MainNavigation />
         <Switch>
           <Route path="/" exact={true}>
             <Landing />
