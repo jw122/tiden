@@ -1,9 +1,9 @@
 .App {
-  text-align: center;
+  /* text-align: center; */
 }
 
 .App-logo {
-  height: 40vmin;
+  height: 20vmin;
   pointer-events: none;
 }
 
@@ -24,11 +24,6 @@
 
 .App-link {
   color: #61dafb;
-}
-
-.payment-form {
-  width: 35%;
-  margin: auto;
 }
 
 @keyframes App-logo-spin {
