@@ -29,7 +29,7 @@ class App extends Component {
             <Landing />
           </Route>
           {/* TODO: update to no longer hard code when user management is in place */}
-          <Route path="/satoshi">
+          <Route path="/shibainu">
             <MerchantProfile />
           </Route>
           <Route path="/dashboard">
