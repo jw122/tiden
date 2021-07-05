@@ -9,6 +9,7 @@ import io.ktor.jackson.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import com.tiden.flagship.payment.routes.registerPaymentRoutes
+import com.tiden.flagship.transfer.registerTransferRoutes
 import io.ktor.http.*
 import org.jetbrains.exposed.sql.Database
 
@@ -59,6 +60,7 @@ fun Application.mainModule() {
 
     registerPaymentRoutes()
     registerMerchantRoutes()
+    registerTransferRoutes()
 
 
 }
