@@ -17,9 +17,9 @@ function MainNavigation() {
             />{" "}
             Tiden
           </Navbar.Brand>
-          {/*<Nav>*/}
-          {/*  <Nav.Link href="/dashboard">Dashboard</Nav.Link>*/}
-          {/*</Nav>*/}
+          <Nav.Link href="/dashboard" style={{ color: "grey" }}>
+            Dashboard
+          </Nav.Link>
         </Container>
       </Navbar>
     </header>

@@ -1,7 +1,11 @@
 import React, { Component } from "react";
 import * as openpgp from "openpgp";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCoffee, faCreditCard } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCoffee,
+  faCreditCard,
+  faCheckCircle,
+} from "@fortawesome/free-solid-svg-icons";
 
 import { Form, Row, Button, Col, Card, Alert } from "react-bootstrap";
 import classes from "./PaymentForm.module.css";
@@ -15,6 +19,7 @@ class PaymentForm extends Component {
     message: "",
     name: "",
     responseToPost: "",
+    showPaymentResults: false,
     // payment fields (TODO: move into its own group?)
     amount: "10.50",
     description: "gift money",
@@ -121,6 +126,7 @@ class PaymentForm extends Component {
 
     const responseBody = await response.text();
     this.setState({ responseToPost: responseBody });
+    this.setState({ showPaymentResults: true });
   };
 
   render() {
@@ -162,9 +168,17 @@ class PaymentForm extends Component {
           <img src="https://img.icons8.com/color/32/000000/mastercard.png" />
         </div>
 
-        <div>
-          <p>{this.state.responseToPost}</p>
-        </div>
+        {this.state.showPaymentResults ? (
+          <Alert variant="success" className={classes.paymentStatus}>
+            <p>
+              <FontAwesomeIcon
+                icon={faCheckCircle}
+                style={{ marginRight: "2%" }}
+              />
+              {this.state.responseToPost}
+            </p>
+          </Alert>
+        ) : null}
         <Form className={classes.paymentForm} onSubmit={this.handleSubmit}>
           <Form.Group className="m-4">
             <Form.Label>Amount</Form.Label>
