@@ -6,8 +6,9 @@ import "./App.css";
 
 import Landing from "./pages/Landing";
 import MerchantProfile from "./pages/MerchantProfile";
-import Dashboard from "./pages/Dashboard";
 import MainNavigation from "./components/layout/MainNavigation";
+import Dashboard from "./pages/Dashboard";
+import SignUp from "./pages/SignUp";
 
 // TODO: change to function() declaration
 class App extends Component {
@@ -25,6 +26,9 @@ class App extends Component {
           </Route>
           <Route path="/dashboard">
             <Dashboard />
+          </Route>
+          <Route path="/sign-up">
+            <SignUp />
           </Route>
         </Switch>
       </div>
