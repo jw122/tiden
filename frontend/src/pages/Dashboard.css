@@ -1,0 +1,9 @@
+.Dashboard-main-container {
+  display: grid;
+  align-items: center;
+  margin-top: 50px;
+}
+
+.Dashboard-main-container > h4 {
+  color: gray;
+}

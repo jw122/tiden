@@ -1,15 +1,6 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import {
-  Form,
-  Row,
-  Button,
-  Col,
-  Navbar,
-  Container,
-  Card,
-} from "react-bootstrap";
-import React, { Component } from "react";
-import { Route, Switch } from "react-router-dom";
+import React, {Component} from "react";
+import {Route, Switch} from "react-router-dom";
 
 import "./App.css";
 
