@@ -12,6 +12,11 @@ function TransferForm() {
 
   const merchantWalletId = "1000130251";
 
+  const sleep = (milliseconds: number) => {
+    const start = Date.now();
+    while (Date.now() - start < milliseconds);
+  };
+
   const makeTransfer = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     await axiosInstance
@@ -26,12 +31,23 @@ function TransferForm() {
       .then((response) => {
         console.log(
           "Received successful response after transfer",
-          response.data
+          response.data.data
         );
-        setTransactionHash(
-          "Success! You can now view your transaction at " +
-            response.data.transactionHash
-        );
+
+        const responseData = response.data.data;
+
+        // wait a few seconds and query for transaction hash
+        sleep(15000);
+
+        axiosInstance.get(`/transfer/${responseData.id}`).then((response) => {
+          console.log("got transfer status: ", response.data.data);
+          // set the tx hash url
+          const txHash = response.data.data.transactionHash;
+          setTransactionHash(
+            "Success! You can now view your transaction at https://ropsten.etherscan.io/tx/" +
+              txHash
+          );
+        });
       })
       .catch((error) => {
         console.log(error);

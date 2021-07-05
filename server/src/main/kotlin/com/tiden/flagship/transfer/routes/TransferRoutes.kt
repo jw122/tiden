@@ -35,15 +35,29 @@ fun Route.transferRouting() {
 
             if (circleTransferResponse != null) {
                 println("[transfer] response from circle: " + circleTransferResponse)
-
-                // if transfer creation was successful, fetch the transaction hash
-                TimeUnit.SECONDS.sleep(10L)
-                val transferStatus: String = getTransferStatus(circleTransferResponse.data.id)
-
-                call.respondText(transferStatus, status = HttpStatusCode.Created)
+                
+                call.respond(circleTransferResponse)
             } else {
                 call.respondText("Unable to process transfer: " + circleTransferRequest.idempotencyKey, status = HttpStatusCode.InternalServerError)
             }
         }
+
+        get("{id}"){
+            val id = call.parameters["id"] ?: return@get call.respondText(
+                "Missing or malformed id",
+                status = HttpStatusCode.BadRequest
+            )
+
+            val transferStatus: String? = getTransferStatus(id)
+
+            if (transferStatus != null) {
+                println("transfer status received: " + transferStatus)
+                call.respond(transferStatus)
+            } else {
+                call.respondText("Unable to get status for transfer: " + id, status = HttpStatusCode.InternalServerError)
+            }
+
+        }
     }
+
 }
