@@ -1,8 +1,13 @@
 # Tiden
 
+## getting started
+`source .env`
 
-## resources used to get started
-[kotlin web server](https://kotlinlang.org/docs/jvm-spring-boot-restful.html#bootstrap-the-project)
+## deployment
+### frontend
+from the root folder
+```bash
+yarn --cwd ./frontend/ build && aws s3 sync ./frontend/build/ $S3_BUCKET_HOSTED_SITE
+```
 
-[flutter app](https://flutter.dev/docs/get-started/web)
-
+### for the backend, see ./server/README.md
