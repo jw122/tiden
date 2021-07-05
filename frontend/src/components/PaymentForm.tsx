@@ -68,21 +68,17 @@ class PaymentForm extends Component {
 
     console.log("Obtained key. Now encrypting credentials");
     const decodedPublicKey = atob(pciEncryptionKey.publicKey);
-    const publicKey = await openpgp.readKey({ armoredKey: decodedPublicKey });
+    const options = {
+      message: openpgp.message.fromText(JSON.stringify(cardCredentials)),
+      publicKeys: (await openpgp.key.readArmored(decodedPublicKey)).keys,
+    };
 
-    return openpgp
-      .encrypt({
-        message: await openpgp.createMessage({
-          text: JSON.stringify(cardCredentials),
-        }),
-        encryptionKeys: publicKey,
-      })
-      .then((ciphertext) => {
-        return {
-          encryptedCredentials: btoa(ciphertext),
-          keyId: pciEncryptionKey.keyId,
-        };
-      });
+    return openpgp.encrypt(options).then((ciphertext) => {
+      return {
+        encryptedCredentials: btoa(ciphertext.data),
+        keyId: pciEncryptionKey.keyId,
+      };
+    });
   };
 
   handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
