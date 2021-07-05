@@ -56,7 +56,12 @@ function TransferForm() {
   // form submission makes an api call to make the transfer. Currently defaulting to USD and ETH
   return (
     <div className="transferForm">
-      <p>{txHash}</p>
+      <div className="my-5">
+        <p>
+          <b>{txHash}</b>
+        </p>
+      </div>
+
       <Form onSubmit={makeTransfer}>
         <Form.Group className="mb-3">
           <Form.Label>Blockchain address</Form.Label>
@@ -75,7 +80,7 @@ function TransferForm() {
             onChange={(e) => setAmountToSend(e.target.value)}
           />
         </Form.Group>
-        <Button variant="primary" type="submit">
+        <Button variant="dark" type="submit">
           Submit
         </Button>
       </Form>
