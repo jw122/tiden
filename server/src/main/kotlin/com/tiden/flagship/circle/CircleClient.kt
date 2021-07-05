@@ -129,6 +129,50 @@ data class PublicKeyResponse(
     val data: PublicKeyResponseData
 )
 
+@Serializable
+data class TransferSource(
+    val type: String,
+    val id: String
+)
+
+@Serializable
+data class TransferDestination(
+    val type: String, // blockchain
+    val address: String,
+    val chain: String, // ETH
+)
+
+@Serializable
+data class CircleTransferRequest(
+    val source: TransferSource,
+    val destination: TransferDestination,
+    val amount: AmountCurrency,
+    val idempotencyKey: String
+)
+
+@Serializable
+data class CircleTransferResponseData(
+    val id: String,
+    val source: TransferSource,
+    val destination: TransferDestination,
+    val amount: AmountCurrency,
+    val transactionHash: String? = "no-tx-hash",
+    val status: String,
+    val createDate: String
+)
+
+@Serializable
+data class CircleTransferResponse(
+    val data: CircleTransferResponseData
+)
+
+val dotenv = dotenv {
+    directory = "../"
+    ignoreIfMalformed = true
+    ignoreIfMissing = true
+}
+val apiKey: String = dotenv["CIRCLE_API_KEY"]
+
 fun createClient() : HttpClient{
     return HttpClient(CIO) {
         install(JsonFeature) {
@@ -205,13 +249,6 @@ suspend fun makePayment(circlePaymentRequest: CirclePaymentRequest): CirclePayme
         }
     }
     val response: HttpResponse = client.post("https://api-sandbox.circle.com/v1/payments") {
-        val dotenv = dotenv {
-            directory = "../"
-            ignoreIfMalformed = true
-            ignoreIfMissing = true
-        }
-        val apiKey: String = dotenv["CIRCLE_API_KEY"]
-
         headers {
             append(HttpHeaders.Accept, "application/json")
             append(HttpHeaders.Authorization, "Bearer $apiKey")
@@ -254,4 +291,40 @@ fun buildPaymentRequest(
         AmountCurrency(amount, "USD"),
         Source(sourceId, sourceType)
     )
+}
+
+suspend fun makeTransfer(circleTransferRequest: CircleTransferRequest): CircleTransferResponse? {
+    val client = HttpClient(CIO) {
+        install(JsonFeature) {
+            serializer = KotlinxSerializer()
+        }
+    }
+    val response: HttpResponse = client.post("https://api-sandbox.circle.com/v1/transfers") {
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+            append(HttpHeaders.Authorization, "Bearer $apiKey")
+        }
+        contentType(ContentType.Application.Json)
+        body = circleTransferRequest
+        print("transfer request to Circle: $body\n")
+    }
+
+    if (response.status.value >= HttpStatusCode.BadRequest.value /*400*/) {
+        print("error with post request to circle payment with response content ${response.content}")
+        return null
+    }
+
+    return response.receive()
+}
+
+suspend fun getTransferStatus(id: String): String {
+    val client = HttpClient(CIO)
+    val response: HttpResponse = client.get("https://api-sandbox.circle.com/v1/transfers/${id}") {
+        headers {
+            append(HttpHeaders.Accept, "application/json")
+            append(HttpHeaders.Authorization, "Bearer $apiKey")
+        }
+    }
+    client.close()
+    return response.receive()
 }
