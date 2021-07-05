@@ -310,7 +310,7 @@ suspend fun makeTransfer(circleTransferRequest: CircleTransferRequest): CircleTr
     }
 
     if (response.status.value >= HttpStatusCode.BadRequest.value /*400*/) {
-        print("error with post request to circle payment with response content ${response.content}")
+        print("error with post request to circle transfer with response content ${response.content}")
         return null
     }
 
