@@ -11,41 +11,37 @@ function TransferForm() {
   // TODO: get merchant wallet id after login/accounts are implemented
 
   const merchantWalletId = "1000130251";
+
+  const makeTransfer = async (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    await axiosInstance
+      .post(`/transfer`, {
+        walletId: merchantWalletId,
+        amount: amountToSend,
+        currency: "USD",
+        destinationType: "blockchain",
+        destinationAddress: destinationAddress,
+        chain: "ETH",
+      })
+      .then((response) => {
+        console.log(
+          "Received successful response after transfer",
+          response.data
+        );
+        setTransactionHash(
+          "Success! You can now view your transaction at " +
+            response.data.transactionHash
+        );
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
   // form submission makes an api call to make the transfer. Currently defaulting to USD and ETH
   return (
     <div className="transferForm">
       <p>{txHash}</p>
-      <Form
-        onSubmit={(e: React.SyntheticEvent) => {
-          console.log("submitting form!");
-          e.preventDefault();
-          axiosInstance
-            .post(`/transfer`, {
-              walletId: merchantWalletId,
-              amount: amountToSend,
-              currency: "USD",
-              destinationType: "blockchain",
-              destinationAddress: destinationAddress,
-              chain: "ETH",
-            })
-            .then((response) => {
-              console.log(
-                "Received successful response after transfer",
-                response.data
-              );
-
-              const txHashUrl =
-                "https://ropsten.etherscan.io/tx/" +
-                response.data.transactionHash;
-              setTransactionHash(
-                "Success! You can now view your transaction at " + txHashUrl
-              );
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-        }}
-      >
+      <Form onSubmit={makeTransfer}>
         <Form.Group className="mb-3">
           <Form.Label>Blockchain address</Form.Label>
           <Form.Control
