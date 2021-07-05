@@ -6,8 +6,6 @@ import "./Landing.css";
 
 
 const Landing = () => {
-    // this should eventually come from the server
-    const apy = 5;
 
     const history = useHistory();
     const handleClick = () => history.push('/sign-up');
@@ -18,7 +16,7 @@ const Landing = () => {
                 <Row className="Landing-main-container">
                     <embed src={logo} className="App-logo"/>
                     <h1>Easy payments with credit cards and crypto</h1>
-                    Take payments from credit cards or crypto, and earn {apy}% interest on your balances.
+                    Take payments from credit cards or crypto, and earn interest on your balances.
                 </Row>
                 <br/><br/><br/>
                 <Row>
