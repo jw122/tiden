@@ -7,7 +7,7 @@ http://www.trytiden.com | HackMoney 2021
 🎥 [Demo](https://www.youtube.com/watch?v=d6pP91_KAR4) | 🎬 [Hackathon Showcase](https://showcase.ethglobal.co/hackmoney2021/tiden)
 
 
-<img src="https://github.com/jw122/tiden/blob/main/assets/landing-page.png" width="300" />
+<img src="https://github.com/jw122/tiden/blob/main/assets/landing-page.png" width="600" />
 
 ## Background
 We envision a world where merchants can accept payments from any country, in the form of a currency as powerful and valuable as the US Dollar. We also want to empower more online businesses and creators by boosting their earnings with APY and passive income as soon as they are received.
@@ -23,7 +23,7 @@ The existing products that do come somewhat close to this still charge high fees
 On top of easily embedding a checkout and payment-receiving experience, we also want to go a step further and leverage the power of DeFi to earn stable yield for merchants who use Tiden.
 
 ## How It's Made
-<img src="https://github.com/jw122/tiden/blob/main/assets/payment.png" width="200" />
+<img src="https://github.com/jw122/tiden/blob/main/assets/payment.png" width="600" />
 
 
 Payment systems are the lifeblood of businesses and are expected to be robust with high uptimes, this is why we chose industry-grade technologies and frameworks to build, deploy, and host our systems.
@@ -37,7 +37,9 @@ We built a complete, end-to-end flow where the card details of a user are encryp
 
 To allow a customer of Tiden to transfer their funds into other crypto wallets or bank accounts, we made user of Circle's Transfers API. In the event of a transfer of USDC from a customer's Tiden account to a crypto wallet, a transaction hash is made available to the customer.
 
-<img src="https://github.com/jw122/tiden/blob/main/assets/dashboard.png" width="200" />
+<img src="https://github.com/jw122/tiden/blob/main/assets/dashboard.png" width="600" />
+
+<img src="https://github.com/jw122/tiden/blob/main/assets/transfer.png" width="600" />
 
 We also took the infrastructure to the next level: Instead of using an entry-level host solution like Heroku, we used AWS ECR to host our server images, and used AWS App Runner to allow for continuous deployment, dynamic server scaling, and resource management of the production Kotlin server. We used AWS S3 and CloudFront to host our static website, which allows for smart routing to the closest edge servers that speed up our website's distribution.
 
@@ -49,7 +51,7 @@ We chose to keep the Kotlin backend and React frontend completely separate inste
 
 We pride ourselves on building a production-grade application with industry-leading infrastructure.
 
-<img src="https://github.com/jw122/tiden/blob/main/assets/architecture.png" width="200" />
+<img src="https://github.com/jw122/tiden/blob/main/assets/architecture.png" width="600" />
 
 ## getting started
 `source .env`
