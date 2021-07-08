@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import "./Dashboard.css";
 import React from "react";
 import axiosInstance from "../utils/Http";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChartLine, faCalendar } from "@fortawesome/free-solid-svg-icons";
 
 const Dashboard = () => {
   const [merchantBalance, setMerchantBalance] = React.useState(null);
@@ -30,17 +32,24 @@ const Dashboard = () => {
     <Container className="Dashboard-main-container">
       <Row>
         <Col>
-          <h4>Gross Volume last 30 days</h4>
-          <h2>$128,000.00</h2>
-          {new Date().toDateString()}
+          <h4>30 Day Volume</h4>
+          <h2>$47,273.58</h2>
+          <p>
+            <FontAwesomeIcon icon={faCalendar}></FontAwesomeIcon>{" "}
+            {new Date().toDateString()}
+          </p>
         </Col>
         <Col>
           <h4>USDC Balance</h4>
           <h2>${merchantBalance}</h2>
+          <p>
+            <FontAwesomeIcon icon={faChartLine}></FontAwesomeIcon> Earning 5.4%
+            APY
+          </p>
         </Col>
         <Col>
           <h4>Payouts</h4>
-          <h2>$128,000.00</h2>
+          <h2>$1,280.00</h2>
         </Col>
       </Row>
       <Row>
