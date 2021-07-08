@@ -5,6 +5,7 @@
   justify-content: center;
   /*font-size: calc(10px + 2vmin);*/
   color: black;
+  margin-top: 3%;
 }
 
 .Signup-main-container {
@@ -21,5 +22,8 @@
   border: none;
   background: transparent;
   min-height: 600px;
+}
 
+.cta-button-row {
+  margin: 5%;
 }
