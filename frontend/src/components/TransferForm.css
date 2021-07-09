@@ -1,4 +1,17 @@
 .transferForm {
   width: 50%;
   margin: auto;
+  margin-top: 3%;
+}
+
+.spinner {
+  text-align: center;
+}
+
+.spinner img {
+  width: 250px;
+}
+
+.txConfirmation {
+  text-align: center;
 }
