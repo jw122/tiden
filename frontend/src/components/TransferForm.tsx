@@ -55,6 +55,9 @@ function TransferForm() {
           const transactionHash = response.data.data.transactionHash;
 
           if (transactionHash) {
+            setTransactionHash(
+              "https://ropsten.etherscan.io/tx/" + transactionHash
+            );
           } else {
             console.log("Tx hash not available");
             // HACK (for demo): if null, return hard-coded url

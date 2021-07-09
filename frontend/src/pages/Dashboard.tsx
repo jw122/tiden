@@ -48,8 +48,8 @@ const Dashboard = () => {
           </p>
         </Col>
         <Col>
-          <h4>Payouts</h4>
-          <h2>$1,280.00</h2>
+          <h4>Total Payouts</h4>
+          <h2>$51,280.00</h2>
         </Col>
       </Row>
       <Row>
