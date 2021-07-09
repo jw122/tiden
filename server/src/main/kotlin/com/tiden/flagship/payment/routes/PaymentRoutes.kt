@@ -109,7 +109,7 @@ fun Route.paymentRouting() {
             if (circlePaymentResponse != null) {
                 PaymentService.storeSuccessfulPayment(cardRequest, paymentRequest, circlePaymentResponse.data)
                 call.respondText(
-                    "Payment of " + circlePaymentResponse.data.amount.amount + " stored correctly. Transaction ID: " + circlePaymentResponse.data.id,
+                    "Payment of " + circlePaymentResponse.data.amount.amount + " was submitted. Message: '" + circlePaymentResponse.data.description + "' Transaction ID: " + circlePaymentResponse.data.id,
                     status = HttpStatusCode.Created
                 )
             } else {
