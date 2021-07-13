@@ -58,9 +58,6 @@ We pride ourselves on building a production-grade application with industry-lead
 
 ## deployment
 ### frontend
-from the root folder
-```bash
-yarn --cwd ./frontend/ build && aws s3 sync ./frontend/build/ $S3_BUCKET_HOSTED_SITE
-```
+commits merged into `main` will be automatically deployed to production
 
 For more instructions for the backend, see ./server/README.md
